@@ -85,7 +85,7 @@ operatorButtons.forEach((button) => {
       result = evaluateResultAtStart(e);
       isFirst = false;
     } else result = operate(operator, +firstNum, +secondNum);
-    console.log(result, firstNum, secondNum);
+    console.log(result, firstNum, secondNum); // TROUBLESHOOT
     secondNum = ''; //resetting the second number.
     hasDecimal = false;
     operator = e.target.textContent; //setting operator to new value
@@ -97,7 +97,7 @@ const evalButton = document.querySelector('.evaluator');
 evalButton.addEventListener('click', (e) => {
   if (isFirst) return;
   result = operate(operator, +firstNum, +secondNum);
-  console.log(result, firstNum, secondNum);
+  console.log(result, firstNum, secondNum); //TROUBLESHOOT
   displayResult();
 });
 
@@ -110,4 +110,16 @@ clearButton.addEventListener('click', (e) => {
   operator = '';
   const para = document.querySelector('.calc-display p');
   para.textContent = '';
+});
+
+const backspaceButton = document.querySelector('#backspace');
+backspaceButton.addEventListener('click', (e) => {
+  const para = document.querySelector('.calc-display p');
+  if (isFirst) {
+    firstNum = firstNum.slice(0, -1);
+    para.textContent = firstNum;
+  } else {
+    secondNum = secondNum.slice(0, -1);
+    para.textContent = secondNum;
+  }
 });
