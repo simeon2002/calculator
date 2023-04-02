@@ -28,56 +28,57 @@ function operate(operator, num1, num2) {
   }
 }
 
-function showValue(e) {
+function showAndStoreNumber(e) {
   const para = document.querySelector('.calc-display p');
-  const paraText = para.textContent;
-  const val = e.target.textContent;
-  if (
-    operators.includes(paraText[paraText.length - 1]) &&
-    operators.includes(val)
-  ) {
-    para.textContent[paraText.length - 1] = val;
-    return;
+  para.textContent = '';
+  if (isFirst) {
+    firstNum += e.target.textContent;
+    para.textContent = firstNum;
+  } else {
+    firstNum = result;
+    secondNum += e.target.textContent;
+    para.textContent = secondNum;
   }
-  para.textContent += val;
 }
 
-function getNumbers(str) {
-  return str.split(/-|\+|\/|\*/);
-}
-
-function getOperators(str) {
-  return str.split('').filter((val) => operators.includes(val));
+function evaluateResultAtStart(e) {
+  operator = e.target.textContent;
+  if (operator === '/' || operator === '*') {
+    return operate(operator, +firstNum, 1);
+  } else {
+    return operate(operator, +firstNum, 0);
+  }
 }
 
 // MAIN SCOPE
-const operators = ['+', '/', '-', '*'];
+let firstNum = '';
+let secondNum = '';
+let isFirst = true;
+let result;
+let operator;
 
-const calcButtons = document.querySelectorAll('.operator, .num');
+const calcButtons = document.querySelectorAll('.num');
 calcButtons.forEach((button) => {
-  button.addEventListener('click', showValue);
+  button.addEventListener('click', showAndStoreNumber);
 });
 
-// const opButtons = document.querySelectorAll('.operator, .evaluator');
-// opButtons.forEach((button) => {
-//   button.addEventListener('click', storeValue);
-// });
-// tried via storing the values and stuff dynamically, but is easiest to do this at the end of operations!!! and also by using the reduce method.
+const operatorButtons = document.querySelectorAll('.operator');
+operatorButtons.forEach((button) => {
+  button.addEventListener('click', (e) => {
+    const para = document.querySelector('.calc-display p');
+    if (isFirst) {
+      result = evaluateResultAtStart(e);
+      isFirst = false;
+    } else result = operate(operator, +firstNum, +secondNum);
+    secondNum = ''; //resetting the second number.
+    operator = e.target.textContent; //setting operator to new value
+    para.textContent = result; //displaying result
+  });
+});
 
 const evalButton = document.querySelector('.evaluator');
 evalButton.addEventListener('click', (e) => {
-  const displayStr = document.querySelector('.calc-display p').textContent;
-  const terms = getNumbers(displayStr);
-  const usedOperators = getOperators(displayStr);
-  console.log(displayStr, terms, usedOperators);
-  let i = 1;
-  const result = terms.reduce((total, term, index) => {
-    if (index == 0 || index == 1) return total;
-    total = operate(usedOperators[i], total, +term);
-    i += 1;
-    return total;
-  }, operate(usedOperators[0], +terms[0], +terms[1]));
-  console.log(result);
+  if (isFirst) return;
+  result = operate(operator, +firstNum, +secondNum);
+  document.querySelector('.calc-display p').textContent = result;
 });
-
-const clearButton = document.querySelector('.clear');
